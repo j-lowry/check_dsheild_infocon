@@ -1,0 +1,46 @@
+check_dshield_infocon.pl is a nagios plugin for checking the DSheild Infocon 
+level.
+
+i. Dependencies
+Perl
+Nagios' utils.pm
+REST::Client
+
+ii. Installation
+1. copy check_dshield_infocon.pl to your nagios plugin directory and edit the 
+"use lib" line to point to where the utils.pm file resides. 
+2. Add a command to your nagios config to run the command. Below is a sample:
+
+define command{
+    command_name    check_dshield_infocon
+    command_line    $USER1$/contrib/check_dshield_infocon.pl
+}
+
+3. Add isc.sans.edu as a host to check. Perhaps use check_http as a host 
+check. That way if the website is down, you error messages will be clearer.
+
+define host{
+    host_name               dsheild
+    alias                   ISC DShield
+    address                 isc.sans.edu
+    check_command           check_http
+    max_check_attempts      3
+    check_period            24x7
+    contacts                security_team
+    notification_interval   120
+    notification_period     24x7
+}
+
+4. Define a service to use the command to check that level
+
+define service{
+    host_name               dsheild
+    service_description     ISC DSheild Status
+    check_command           check_dsheild_infocon
+    max_check_attempts      1
+    check_interval          60
+    retry_interval          60
+    check_period            24x7
+    notifiction_interfaval  24x7
+    contacts                security_team
+}
